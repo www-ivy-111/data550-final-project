@@ -1,0 +1,213 @@
+---
+title: "DATA 550 Final Project: Prediction of Recurrence in Differentiated Thyroid Cancer"
+author: "Weiwei Wu"
+date: "2024-02-15"
+output: html_document
+---
+
+## 1 Introduction
+
+Differentiated thyroid cancers (DTCs) is one of the most common endocrine malignancies, known for its relatively favorable prognosis yet perplexing recurrence patterns. Despite advancements in treatment, a noteworthy proportion of patients experience recurrence, which poses a considerable challenge in clinical management ([Chen et al., 2023](https://doi.org/10.1016/s0140-6736(23)00020-x))([Coca-Pelaz et al., 2023](https://doi.org/%2010.3390/cancers15102692)).\
+  \
+The dataset used for this analysis is sourced from the ["Differentiated Thyroid Cancer Recurrence" dataset](https://archive.ics.uci.edu/dataset/915/differentiated+thyroid+cancer+recurrence) in UCI Machine Learning Repository. The dataset has 383 patients, all monitored over a duration of 10-15 years at a single medical center in Finland. It comprises 17 variables that include patient demographics, 13 clinicopathological features, and follow-up outcomes. These variables are:
+
+1.  Age: Patient's age(continuous)\
+2.  Gender: Patient's gender (categorical)\
+3.  Smoking: Smoking status (categorical)\
+4.  Smoking History: History of smoking (categorical)\
+5.  Radiothreapy History: History of radiotherapy (categorical)\
+6.  Thyroid Function: Thyroid function details (categorical)\
+7.  Physical Examination: Results of physical examination (categorical)\
+8.  Adenopathy: Presence of adenopathy (categorical)\
+9.  Pathology: Pathology details (categorical)\
+10. Focality: Focality information (categorical)\
+11. Risk: Risk assessment (categorical)\
+12. Tumor, Node, Metastasis, Stage: TNM cancer staging attributes (categorical)\
+13. Response: initial treatment response (categorical)\
+14. Recurred: Outcome variable of thyroid cancer recurrence status (categorical)
+
+Further details on the dataset are available in the [paper](https://doi.org/10.1007/s00405-023-08299-w) where it was first introduced.\
+  \
+The primary objective of this analysis is to develop a predictive model to identify the likelihood of thyroid cancer recurrence. Using data available, the study aims to uncover patterns and associations that could indicate a higher risk of recurrence. The findings from this analysis are intended to serve as a reference for tailoring follow-up strategies and interventions in a clinical setting, thereby enhancing cancer rehabilitation and recurrence prevention.
+
+## 2 Method and Analysis
+
+```{r, library, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gtsummary)
+library(patchwork)
+library(ggeasy)
+library(cowplot)
+library(colorspace) 
+library(caret)
+library(car)
+library(ROCR)
+library(pROC)
+library(knitr)
+```
+
+```{r, echo=FALSE, message=FALSE}
+here::i_am("report/report.Rmd")
+```
+
+```{r, message=FALSE}
+data_path <- here::here("data", "clean_data.rds")
+Thy_Diff <- readRDS(data_path)
+head(Thy_Diff)
+```
+
+
+### 2.1 Split the dataset
+
+The dataset was split into training and testing sets using a 70/30 split.
+
+```{r, out.width="50%", results='asis'}
+kable(t(table(Thy_Diff$Train)))
+```
+
+### 2.2 Exploratory Data Analysis (EDA)
+
+The dataset are summarized in the following table, which presents the distribution of variables across the overall dataset, as well as within the training and testing subsets. EDA was conducted on the overall dataset.
+
+```{r}
+table_1 <- readRDS(here::here("output", "table1.rds"))
+table_1
+```
+
+The median age across the dataset is approximately 37 years, with similar distributions in both the training and testing sets. This indicates a relatively young patient cohort. Majority of the patients are female (approximately 81%), reflecting the known higher prevalence of thyroid disorders among females. Only a small percentage of patients are smokers (13%), which might be relevant for further analysis regarding the impact of smoking on thyroid cancer recurrence. A minor proportion of the dataset includes patients with a history of radiotherapy, which could be an area of interest for understanding its role in cancer recurrence.
+
+##### Outcome Variable
+
+The figure below is the distribution of the outcome variable `Recurred`, which shows a slight imbalance.
+  
+
+```{r, out.width="40%", fig.cap=""}
+knitr::include_graphics(here::here("output/descriptive_bar_outcome.png"))
+```
+
+##### Continuous Variable
+
+```{r, out.width="80%", fig.cap=""}
+knitr::include_graphics(here::here("output/descriptive_age_plots.png"))
+```
+
+-   Age by Gender (Histogram): The overall and female age distribution in the dataset are right-skewed, showing that most patients are in younger age range. The concentration of ages is 30 to 40.\
+-   Age by Recurred Status (Boxplot): The recurrence group has a higher median age compared to the non-recurrence group.\
+-   Age by Stage (Boxplot): Median patients age tended to be higher for higher stages of cancer at diagnosis.\
+-   Age by Risk (Boxplot): Older patients tended to have higher levels of assessed risk.
+
+##### Categorical Variables
+
+The pie charts below for categorical variables a clear visual representation of the Table 1.
+
+```{r, include = FALSE, results='hide'}
+# Categorical Variables
+colnames(Thy_Diff)[-1]
+```
+
+```{r, out.width="100%", fig.cap=""}
+knitr::include_graphics(here::here("output/descriptive_pie_charts.png"))
+```
+
+### 2.3 Modeling
+
+##### Step 1: Fit univariate models
+
+Initially, univariate logistic regression models were fitted for each predictor.
+
+11 variables showed as follows were screened out of 16 variables.
+
+```{r}
+var.uni <- readRDS(here::here("output", "univariate_variables.rds"))
+var.uni
+```
+
+##### Step 2: Fit multivariable model
+
+We then constructed a multivariable logistic regression model, incorporating variables that showed significance in the univariate analysis. Variance Inflation Factors (VIFs) suggested the presence of serious multicollinearity. The details of this model is skipped here.
+
+```{r, warning=FALSE}
+model1 <- readRDS(here::here("output", "multivariable_model.rds"))
+model1$call
+```
+```{r, warning=FALSE}
+kable(vif(model1))
+```
+
+#### Step 3: Stepwise selection
+
+A `backward` stepwise selection was applied to refine the model.
+
+The retaining variables after backward slection were showed in the model below:
+
+```{r, warning=FALSE}
+model.step <- readRDS(here::here("output", "stepwise_model.rds"))
+model.step$call
+```
+
+VIFs in the following table indicated that the issue of multicollinearity still exited in the new model.
+
+```{r}
+kable(vif(model.step))
+```
+
+#### Step 4: Final Model
+
+The variable `Smoking` and `Smoking History` were combined into a new variable `Smoker` due to clinical reason.  
+ \ \  
+The variable `Stage` was removed due to the issue of multicollinearity. The final model was presented in the table below, including six predictors `Age`, `Gender`, `Smoker`, `Focality`, `Node`, and `Response`.\
+- Age: The odds of cancer recurrence increase by 11% with each additional year of age (p = 0.015).\
+- Gender: Males have approximately 4.86 times higher odds of recurrence compared to females, although this result is not statistically significant.\
+- Smoker: Current or previous smokers have slightly lower odds of recurrence compared to non-smokers, but this difference is not statistically significant.\
+- Focality: Patients with uni-focal disease have 3.83 times higher odds of recurrence compared to those with multi-focal disease, though this result is not statistically significant.\
+- Node: Patients with N1a nodal status have significantly higher odds of recurrence compared to N0 status (p = 0.018).\
+- Response: Patients with a structurally incomplete response to treatment have significantly higher odds of recurrence (p = 0.001).
+
+```{r, warning=FALSE}
+model3 <- readRDS(here::here("output", "final_model.rds"))
+model3$call
+```
+```{r, warning=FALSE}
+model3_tbl <- readRDS(here::here("output", "final_model_tbl.rds"))
+model3_tbl
+```
+
+According the the VIFs results as followed, there is no evidence of multicollinearity in the final model.
+
+```{r, warning=FALSE}
+kable(vif(model3))
+```
+
+Lack of fit test was conducted to compare the model after backward selection and the final model. Since this p-value is less than 0.05, we can conclude that the final model offers a statistically better fit.
+
+```{r, warning=FALSE}
+# Lack of fit test
+anova(model3, model.step)
+```
+
+### 2.4 Model Evaluation
+
+The final model was evaluated on the testing set, using confusion matrix.
+
+The accuracy, sensitivity, precision, and specificity on testing set was showed as below. These metrics suggest that the model is robust and reliable in predicting thyroid cancer recurrence, balancing both the identification of true positive cases and the avoidance of false positives.
+
+```{r}
+evaluation_tbl <- readRDS(here::here("output", "evaluation_tbl.rds"))
+kable(evaluation_tbl)
+```
+
+The Receiver Operating Characteristic (ROC) curve below was also used to evaluate the model's performance. A high area under the curve (AUC) of 0.963 indicates the ideal performance of the final model.
+
+```{r, message=FALSE, out.width="50%", results='asis'}
+knitr::include_graphics(here::here("output", "roc_plots.png"))
+```
+\ \   
+  
+## Discussion
+
+This analysis of the Differentiated Thyroid Cancer Recurrence dataset has provided valuable insights into factors that may influence the recurrence of thyroid cancer. The study aimed to develop a predictive model to identify the likelihood of thyroid cancer recurrence, utilizing a range of patient demographics and clinicopathological features.\
+  \
+The final model exhibited excellent predictive performance. The results indicate a strong capability to accurately identify patients at risk of recurrence. The model highlights `Age` and `Node status`, as significant predictors of recurrence, with older age and N1a nodal status associated with higher odds of recurrence. `Gender`, `Smoker`, and `Focality`, while included in the model, do not show statistically significant associations with recurrence. The strongest predictor of recurrence is an incomplete structural `response` to treatment, indicating a critical area for clinical focus.\
+  \
+For future analyses, there is a need to consider interactions between predictors. Potential interactions can provide deeper insights into clinical interpretation and inference.
