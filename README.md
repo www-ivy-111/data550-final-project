@@ -1,7 +1,21 @@
-# Final Project 4    
+# Final Project 6    
+   
+   
+##  Project Environment Setting Up and Report Generation  
+1. Clone the Repository from the github to your local machine  
+2. Make sure you have `make` and `R` installed on your system  
+3. Make sure you have `renv` r package is installed  
+4. Open a terminal in the project directory  
+5. Run command `make install` to restore the R package environment using `renv`  
+6. Run `make report` to compile the final report   
+   
+   
    
 ## Repository stucture
-The raw datase `Thyroid_Diff.csv` was saved in the `data/` folder. Codes were saved in the `code/` folder. The final report was saved in the `report/` folder.  
+The raw dataset `Thyroid_Diff.csv` was saved in the `data/` folder.  
+Codes were saved in the `code/` folder.  
+The final report was saved in the `report/` folder.   
+  
 - README.md
 - Makefile
 - data/
@@ -9,17 +23,13 @@ The raw datase `Thyroid_Diff.csv` was saved in the `data/` folder. Codes were sa
 - output/
 - report/
   
-  
+   
 ## Report contents
-Key sections include:
+Key sections include:  
 1. Introduction: Introduce the study  
 2. Method and Analysis: Describes the methods and results for data preparation, exploratory data analysis, and modeling process and model evaluation  
 3. Discussion: Discusses the implications for clinical management and future research
-
-## Report Generation  
-1. Clone the Repository from the github  
-2. Navigate to the Project Directory  
-3. Generate the Report: To compile the final report, execute the Makefile with the following command: `make report`  
+  
   
   
 ## Code description 

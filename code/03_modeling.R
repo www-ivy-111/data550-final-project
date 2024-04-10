@@ -5,6 +5,7 @@ library(car)
 library(ROCR)
 library(pROC)
 library(knitr)
+library(broom)
 
 here::i_am("code/03_modeling.R")
 
