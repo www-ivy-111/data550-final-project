@@ -6,6 +6,7 @@ library(ROCR)
 library(pROC)
 library(knitr)
 library(broom)
+library(parameters)
 
 here::i_am("code/03_modeling.R")
 
@@ -38,7 +39,7 @@ model1 <- glm(Recurred ~ Age + I(Gender) + I(Smoking) + I(`Smoking History`) + I
 model1.vif <- kable(vif(model1))
 print(model1.vif)
 
-model1_tbl <- tbl_regression(model1, exponentiate = TRUE)
+model1_tbl <- tbl_regression(model1, exponentiate = TRUE, tidy_fun = broom.helpers::tidy_parameters)
 model1_tbl
 
 saveRDS(

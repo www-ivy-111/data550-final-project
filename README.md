@@ -1,15 +1,26 @@
-# Final Project 6    
-   
-   
-##  Project Environment Setting Up and Report Generation  
+# Final Project 8    
+  
+  
+##  Project Environment Setting Up  
 1. Clone the Repository from the github to your local machine  
-2. Make sure you have `make` and `R` installed on your system  
-3. Make sure you have `renv` r package is installed  
-4. Open a terminal in the project directory  
-5. Run command `make install` to restore the R package environment using `renv`  
-6. Run `make report` to compile the final report   
+2. Navigate to the project directory in terminal  
+
    
-   
+## Report Generation     
+There are two ways to generate the report: locally on your computer or using a Docker image.   
+
+- Locally:  
+1. Make sure you have `make` and `R` installed on your system  
+2. Make sure you have `renv` R package is installed  
+3. Open a terminal in the project directory  
+4. Run command `make install` to restore the R package environment using `renv`  
+5. Run `make report` to compile the final report   
+
+- Using Docker:  
+1. Download the image from [DockerHub Repository](https://hub.docker.com/r/wwwivy111/data550_final_project/)   
+2. Run command `make mount-report` in the terminal to generate the report  
+3. The compiled report should be in your local `\report` folder  
+4. (Optional) If you prefer to build the image yourself instead of downloading it from DockerHub, use the command `make data550_final_project`. An image called "project_image" will be built.        
    
 ## Repository stucture
 The raw dataset `Thyroid_Diff.csv` was saved in the `data/` folder.  
@@ -18,6 +29,9 @@ The final report was saved in the `report/` folder.
   
 - README.md
 - Makefile
+- Dockerfile
+- renv.lock
+- renv/
 - data/
 - code/
 - output/
@@ -72,11 +86,12 @@ Key sections include:
   
 `Makefile`
 
-  - contains rules for building the final report
+  - contains rules for building the final report and other targets  
   - `make report` will compile the report into `.html` object
   - `make split_data` will generate the outputs of `code/01_split_data.R`  
   - `make EDA` will generate the outputs of `code/02_EDA.R`  
   - `make modeling` will generate the outputs of `code/03_modeling.R`  
+  - `make clean` will clean all outputs  
   
   
   

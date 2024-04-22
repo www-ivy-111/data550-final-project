@@ -23,8 +23,13 @@ report/report.html: split_data EDA modeling
 	Rscript code/04_render_report.R
 
 # Phony targets for workflow steps
-.PHONY: EDA modeling clean split_data report
-report: report/report.html   
+.PHONY: EDA modeling clean split_data report mount-report
+
+report:    
+	Rscript code/01_split_data.R
+	Rscript code/02_EDA.R
+	Rscript code/03_modeling.R 
+	Rscript code/04_render_report.R
 
 split_data: output/clean_data.rds output/test.rds output/train.rds
 
@@ -38,4 +43,30 @@ modeling: output/univariate_variables.rds output/multivariable_model.rds\
  
 clean:
 	rm -f output/* && rm -f report/*.html && rm -f data/*.rds
-	
+
+# ------------------------------------------------------------------------------
+# DOCKER-ASSOCITATED RULES
+
+PROJECTFILES = report/report.Rmd code/01_split_data.R code/02_EDA.R code/03_modeling.R code/04_render_report.R Makefile
+RENVFILES = renv.lock renv/activate.R renv/settings.json
+
+# Rule to build image 
+data550_final_project: Dockerfile $(PROJECTFILES) $(RENVFILES)
+	docker build -t project_image .
+	touch $@
+
+# Rule to run container 
+## Detect OS
+OS := $(shell uname -s)
+## Set volume mount path prefix based on OS
+ifeq ($(OS),Windows_NT)
+	VOLUME_PREFIX := "/"
+else
+	VOLUME_PREFIX := ""
+endif
+## Mount Rule
+mount-report: 
+	docker run -v "$(OS_PATH_PREFIX)$(PWD)/report":/project/report data550_final_project
+
+
+
