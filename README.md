@@ -17,10 +17,11 @@ There are two ways to generate the report: locally on your computer or using a D
 5. Run `make report` to compile the final report   
 
 - Using Docker:  
-1. Download the image from [DockerHub Repository](https://hub.docker.com/r/wwwivy111/data550_final_project/)   
+1. Pull the image from [DockerHub Repository](https://hub.docker.com/r/wwwivy111/data550_final_project/)   
 2. Run command `make mount-report` in the terminal to generate the report  
+(This step works for both Windows-OS and a Mac/Linux-OS)  
 3. The compiled report should be in your local `\report` folder  
-4. (Optional) If you prefer to build the image yourself instead of downloading it from DockerHub, use the command `make data550_final_project`. An image called "project_image" will be built.        
+4. (Optional) If you prefer to build the image yourself instead of downloading it from DockerHub, use the command `make build_image`. An image called "wwwivy111/data550_final_project" will be built.        
    
 ## Repository stucture
 The raw dataset `Thyroid_Diff.csv` was saved in the `data/` folder.  

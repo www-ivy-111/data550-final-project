@@ -51,8 +51,8 @@ PROJECTFILES = report/report.Rmd code/01_split_data.R code/02_EDA.R code/03_mode
 RENVFILES = renv.lock renv/activate.R renv/settings.json
 
 # Rule to build image 
-data550_final_project: Dockerfile $(PROJECTFILES) $(RENVFILES)
-	docker build -t project_image .
+build_image: Dockerfile $(PROJECTFILES) $(RENVFILES)
+	docker build -t wwwivy111/data550_final_project .
 	touch $@
 
 # Rule to run container 
@@ -66,7 +66,7 @@ else
 endif
 ## Mount Rule
 mount-report: 
-	docker run -v "$(OS_PATH_PREFIX)$(PWD)/report":/project/report data550_final_project
+	docker run -v "$(OS_PATH_PREFIX)$(PWD)/report":/project/report wwwivy111/data550_final_project
 
 
 
