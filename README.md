@@ -3,6 +3,9 @@
   
 ##  Project Environment Setting Up  
 1. Clone the Repository from the github to your local machine  
+```
+git clone https://github.com/www-ivy-111/data550-final-project
+```
 2. Navigate to the project directory in terminal  
 
    
@@ -18,6 +21,9 @@ There are two ways to generate the report: locally on your computer or using a D
 
 - Using Docker:  
 1. Pull the image from [DockerHub Repository](https://hub.docker.com/r/wwwivy111/data550_final_project/)   
+```
+docker pull wwwivy111/data550_final_project
+```  
 2. Run command `make mount-report` in the terminal to generate the report  
 (This step works for both Windows-OS and a Mac/Linux-OS)  
 3. The compiled report should be in your local `\report` folder  
